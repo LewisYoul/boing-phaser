@@ -13,10 +13,6 @@ export default class Play extends Phaser.Scene {
     this.numPlayers = data.numPlayers
   }
 
-	preload () {
-    this.loadAssets();
-  }
-
   create () {
     this.configureInput();
     this.createTable();
@@ -26,72 +22,36 @@ export default class Play extends Phaser.Scene {
 
   scoreGoal(attacker, defender, effect) {
     this[attacker].score++;
-    this[defender].displayImage('score', 12);
     this.scoreEffect = this.add.image(400, 240, effect)
+    
     let position;
-
     attacker === 'bat1' ? position = [340, 83] : position = [460, 83];
-
-    this.pointEffect = this.add.image(...position, `${attacker}_digit${this[attacker].score}`);
-    this.timer = 12;
-    if (this[attacker].isWinner()) { this.scene.start('GameOver'); };
-    this[`${attacker}Score`].destroy();
-    this[`${attacker}Score`] = this.add.image(...position, `digit0${this[attacker].score}`);
+    
+    if (this[attacker].isWinner()) {
+      this.scene.start('GameOver');
+    } else {
+      this.timer = 12;
+      this[`${attacker}Score`].destroy();
+      this[`${attacker}Score`] = this.add.image(...position, `digit0${this[attacker].score}`);
+    }
   }
 
   update () {
     if (this.ball.isOut()) {
       if (this.ball.isOutLeft()) {
-        this.scoreGoal('bat2', 'bat1', 'effect0')
+        this.scoreGoal('bat2', 'bat1', 'effect1')
       } else {
-        this.scoreGoal('bat1', 'bat2', 'effect1')
+        this.scoreGoal('bat1', 'bat2', 'effect2')
       }
       this.ball.kickOff()
     } else {
       if (this.timer > 0) {
         this.timer--;
-      } else if (this.scoreEffect || this.pointEffect){
+      } else if (this.scoreEffect){
         this.scoreEffect.destroy();
-        this.pointEffect.destroy();
       }
       this.objects.forEach(obj => obj.update(this.ball));
     }
-  }
-
-  loadAssets() {
-    this.loadImages();
-    this.loadAudio();
-  }
-
-  loadImages() {
-    this.load.image('table', 'src/assets/images/table.png');
-    this.load.image('effect0', 'src/assets/images/effect0.png');
-    this.load.image('effect1', 'src/assets/images/effect1.png');
-    this.load.image('left_bat', 'src/assets/images/bat00.png');
-    this.load.image('left_bat_hit', 'src/assets/images/bat01.png');
-    this.load.image('left_bat_score', 'src/assets/images/bat02.png');
-    this.load.image('right_bat', 'src/assets/images/bat10.png');
-    this.load.image('right_bat_hit', 'src/assets/images/bat11.png');
-    this.load.image('right_bat_score', 'src/assets/images/bat12.png');
-    this.load.image('ball', 'src/assets/images/ball.png');
-    for (let i = 0; i < 10; i++) {
-      this.load.image(`digit0${i}`, `src/assets/images/digit0${i}.png`);
-    };
-    for (let i = 0; i < 5; i++) {
-      this.load.image(`impact${i}`, `src/assets/images/impact${i}.png`);
-    };
-    for (let i = 1; i < 10; i++) {
-      this.load.image(`bat2_digit${i}`, `src/assets/images/digit1${i}.png`);
-      this.load.image(`bat1_digit${i}`, `src/assets/images/digit2${i}.png`);
-    };
-  }
-
-  loadAudio() {
-    this.load.audio('hit_slow0', 'src/assets/sounds/hit_slow0.ogg');
-    this.load.audio('hit_medium0', 'src/assets/sounds/hit_medium0.ogg');
-    this.load.audio('hit_fast0', 'src/assets/sounds/hit_fast0.ogg');
-    this.load.audio('hit_veryfast0', 'src/assets/sounds/hit_veryfast0.ogg');
-    this.load.audio('hit_synth0', 'src/assets/sounds/hit_synth0.ogg');
   }
 
   configureInput() {
@@ -133,7 +93,6 @@ export default class Play extends Phaser.Scene {
   }
 
   collideBall(ball, bat) {
-    bat.displayImage('hit')
     new Impact(this, ball.x, ball.y, 'impact0');
     ball.collideWithBat(bat)
   }
