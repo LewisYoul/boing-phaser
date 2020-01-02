@@ -2,11 +2,14 @@ import Phaser from "phaser";
 import Bat from './Bat';
 import Ball from './Ball';
 import Impact from './Impact';
+import Powerup from "./Powerup";
 
 export default class Play extends Phaser.Scene {
 	constructor() {
     super('Play')
     this.timer = 0;
+    this.powerupCountdown = 60 * 6
+    this.powerups = [];
   }
 
   init(data) {
@@ -43,8 +46,19 @@ export default class Play extends Phaser.Scene {
       } else {
         this.scoreGoal('bat1', 'bat2', 'effect2')
       }
+      if (this.powerups.length > 0) { this.powerups.forEach(powerup => powerup.destroy()) }
       this.ball.kickOff()
     } else {
+      if (this.powerupCountdown <= 0) {
+        this.powerupCountdown = 60 * 6;
+        const powerup = new Powerup(this, this.halfWidth - 50, this.halfHeight, 'gravity')
+        this.powerups.push(powerup);
+        this.physics.add.collider(this.bat1, powerup);
+        this.physics.add.collider(this.bat2, powerup);
+        this.physics.add.overlap(this.ball, powerup, this.collidePowerup, null, this);
+        this.powerupCountdown = 60 * 6;
+      }
+      this.powerupCountdown--
       if (this.timer > 0) {
         this.timer--;
       } else if (this.scoreEffect){
@@ -74,14 +88,15 @@ export default class Play extends Phaser.Scene {
 
   createObjects() {
     if (this.numPlayers === 1) {
-      this.bat1 = new Bat(this, 40, 240, 'left_bat', { up: this.keys.up, down: this.keys.down }).setDepth(1);
-      this.bat2 = new Bat(this, 760, 240, 'right_bat').setDepth(1);
+      this.bat1 = new Bat(this, 40, 240, 'left_bat', { up: this.keys.up, down: this.keys.down });
+      this.bat2 = new Bat(this, 760, 240, 'right_bat');
     } else if (this.numPlayers === 2) {
-      this.bat1 = new Bat(this, 40, 240, 'left_bat', { up: this.keys.w, down: this.keys.s }).setDepth(1);
-      this.bat2 = new Bat(this, 760, 240, 'right_bat', { up: this.keys.up, down: this.keys.down }).setDepth(1);
+      this.bat1 = new Bat(this, 40, 240, 'left_bat', { up: this.keys.w, down: this.keys.s });
+      this.bat2 = new Bat(this, 760, 240, 'right_bat', { up: this.keys.up, down: this.keys.down });
     }
 
-    this.ball = new Ball(this, 400, 240, 'ball').setDepth(1);
+    
+    this.ball = new Ball(this, 400, 300, 'ball')
     this.objects = [this.bat1, this.bat2, this.ball]
   }
 
@@ -95,5 +110,10 @@ export default class Play extends Phaser.Scene {
   collideBall(ball, bat) {
     new Impact(this, ball.x, ball.y, 'impact0');
     ball.collideWithBat(bat)
+  }
+
+  collidePowerup(ball, powerup) {
+    ball.enableGravity()
+    powerup.destroy()
   }
 }

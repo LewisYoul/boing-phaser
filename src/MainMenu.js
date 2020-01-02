@@ -17,6 +17,7 @@ export default class MainMenu extends Phaser.Scene {
 		this.load.image('effect1', 'src/assets/images/effect1.png');
     this.load.image('effect2', 'src/assets/images/effect2.png');
     this.load.image('ball', 'src/assets/images/ball_white.png');
+    this.load.image('gravity', 'src/assets/images/gravity.png');
 
     for (let i = 0; i < 10; i++) {
       this.load.image(`digit0${i}`, `src/assets/images/digit0${i}.png`);

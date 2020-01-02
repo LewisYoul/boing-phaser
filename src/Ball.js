@@ -6,13 +6,17 @@ export default class Ball extends Phaser.Physics.Arcade.Sprite {
     scene.add.existing(this)
     scene.physics.add.existing(this)
     this.speed = 300;
-    this.setVelocity(this.speed, 0);
+    this.setVelocity(this.speed, -20);
     this.setCollideWorldBounds(true);
-    this.setBounce(1)
+    this.setBounce(1);
     this.setSize(width, height)
+    this.setDepth(1);
+    this.gravityOn = false;
   }
 
   kickOff() {
+    this.gravityOn = false;
+    this.setGravityY(0);
     this.speed = 300;
     const velocity = this.isOutLeft() ? -this.speed : this.speed
     this.setVelocity(velocity, 0);
@@ -22,6 +26,10 @@ export default class Ball extends Phaser.Physics.Arcade.Sprite {
   collideWithBat(bat) {
     this.increaseSpeed();
     this.playCollisionSound();
+    if (this.gravityOn) {
+      this.gravityOff = true;
+      this.setGravityY(0);
+    }
     const vector = this.body.velocity.clone() // Clone the vector of the ball so we have reference to it
     const differenceY = this.y - bat.y; // Determine how far from the center of the bat the ball is
 
@@ -66,6 +74,15 @@ export default class Ball extends Phaser.Physics.Arcade.Sprite {
       this.scene.sound.play('hit_fast0')
     } else {
       this.scene.sound.play('hit_veryfast0')
+    }
+  }
+
+  enableGravity() {
+    this.gravityOn = true;
+    if (this.y >= 280) {
+      this.setGravityY(-this.speed * 5)
+    } else {
+      this.setGravityY(this.speed * 5)
     }
   }
 }

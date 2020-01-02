@@ -16,6 +16,9 @@ export default class Bat extends Phaser.Physics.Arcade.Sprite {
     this.setCollideWorldBounds(true);
     this.setImmovable(1)
     this.setSize(width, height)
+    this.body.setAllowGravity(false);
+    this.setDepth(1);
+    this.setBounce(1);
   }
 
 
