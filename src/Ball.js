@@ -62,7 +62,7 @@ export default class Ball extends Phaser.Physics.Arcade.Sprite {
   }
 
   increaseSpeed() {
-    this.speed += 50;
+    this.speed += 25;
   }
 
   playCollisionSound() {
@@ -79,10 +79,10 @@ export default class Ball extends Phaser.Physics.Arcade.Sprite {
 
   enableGravity() {
     this.gravityOn = true;
-    if (this.y >= 280) {
-      this.setGravityY(-this.speed * 5)
+    if (this.y >= 240) {
+      this.setGravityY(-this.speed * 4)
     } else {
-      this.setGravityY(this.speed * 5)
+      this.setGravityY(this.speed * 4)
     }
   }
 }

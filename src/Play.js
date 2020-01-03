@@ -51,7 +51,7 @@ export default class Play extends Phaser.Scene {
     } else {
       if (this.powerupCountdown <= 0) {
         this.powerupCountdown = 60 * 6;
-        const powerup = new Powerup(this, this.halfWidth - 50, this.halfHeight, 'gravity')
+        const powerup = new Powerup(this, this.halfWidth, this.halfHeight, 'gravity')
         this.powerups.push(powerup);
         this.physics.add.collider(this.bat1, powerup);
         this.physics.add.collider(this.bat2, powerup);
